@@ -5,7 +5,7 @@ import { defaultOptions, getGlobalOptions } from './config';
 type ReturnParams<T extends (...args: any) => any> = T extends ((...args: infer R) => any) ? R : any;
 type ReturnPromise<T> = T extends Promise<infer R> ? R : T;
 
-const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, options?: IUserOptions) => () => {
+const useRequestImplement = <K extends (...args: any[]) => Promise<any>>(request: K, options?: IUserOptions) => () => {
   type IParams = ReturnParams<K>
   type IResult = ReturnPromise<ReturnType<K>>
 
@@ -87,6 +87,10 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
   });
 
   return { state, run, cancel };
+};
+
+const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, options?: IUserOptions) => () => {
+  useRequestImplement(request, options)();
 };
 
 export default useRequest;
