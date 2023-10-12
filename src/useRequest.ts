@@ -24,6 +24,8 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
     state.error.value = null;
     setLoadingState(false);
     lastCacheTime = Date.now();
+    mergedOptions.onSuccess && mergedOptions.onSuccess(state.result.value);
+    mergedOptions.onAfter && mergedOptions.onAfter();
     return result;
   };
   const reject = (error: Error) => {
@@ -34,6 +36,8 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
     state.result.value = null;
     state.error.value = error;
     setLoadingState(false);
+    mergedOptions.onError && mergedOptions.onError(state.error.value);
+    mergedOptions.onAfter && mergedOptions.onAfter();
     return error;
   };
 
@@ -43,6 +47,7 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
   };
 
   const run = async (...args: IParams) => {
+    mergedOptions.onBefore && mergedOptions.onBefore();
     if (mergedOptions.useLastRequest && isFetching) {
       // 等待进行中的请求完成
       return;
@@ -53,6 +58,8 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
       setLoadingState(true);
       timer = setTimeout(() => {
         setLoadingState(false);
+        mergedOptions.onSuccess && mergedOptions.onSuccess(state.result.value);
+        mergedOptions.onAfter && mergedOptions.onAfter();
       }, 20);
       return;
     }
@@ -66,6 +73,8 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
   };
   
   const cancel = () => {
+    timer && clearTimeout(timer);
+    setLoadingState(false);
     abortController?.abort('cancel request');
   };
 
