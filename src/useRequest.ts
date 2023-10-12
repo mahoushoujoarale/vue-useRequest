@@ -1,4 +1,4 @@
-import { onScopeDispose, shallowRef } from 'vue';
+import { onScopeDispose, shallowRef } from 'vue-demi';
 import { IUserOptions } from './types';
 import { defaultOptions, getGlobalOptions } from './config';
 
