@@ -1,3 +1,3 @@
 export { IGlobalOptions, IUserOptions } from './types';
-export { setGlobalOptions } from './config';
+export { setGlobalOptions } from './options';
 export { default as useRequest } from './useRequest';

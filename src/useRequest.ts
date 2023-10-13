@@ -1,11 +1,11 @@
 import { onScopeDispose, shallowRef } from 'vue-demi';
 import { IUserOptions } from './types';
-import { defaultOptions, getGlobalOptions } from './config';
+import { defaultOptions, getGlobalOptions } from './options';
 
 type ReturnParams<T extends (...args: any) => any> = T extends ((...args: infer R) => any) ? R : any;
 type ReturnPromise<T> = T extends Promise<infer R> ? R : T;
 
-const useRequestImplement = <K extends (...args: any[]) => Promise<any>>(request: K, options?: IUserOptions) => () => {
+const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, options?: IUserOptions) => {
   type IParams = ReturnParams<K>
   type IResult = ReturnPromise<ReturnType<K>>
 
@@ -24,7 +24,7 @@ const useRequestImplement = <K extends (...args: any[]) => Promise<any>>(request
     state.error.value = null;
     setLoadingState(false);
     lastCacheTime = Date.now();
-    mergedOptions.onSuccess && mergedOptions.onSuccess(state.result.value);
+    mergedOptions.onSuccess && mergedOptions.onSuccess(result);
     mergedOptions.onAfter && mergedOptions.onAfter();
     return result;
   };
@@ -36,7 +36,7 @@ const useRequestImplement = <K extends (...args: any[]) => Promise<any>>(request
     state.result.value = null;
     state.error.value = error;
     setLoadingState(false);
-    mergedOptions.onError && mergedOptions.onError(state.error.value);
+    mergedOptions.onError && mergedOptions.onError(error);
     mergedOptions.onAfter && mergedOptions.onAfter();
     return error;
   };
@@ -58,7 +58,7 @@ const useRequestImplement = <K extends (...args: any[]) => Promise<any>>(request
       setLoadingState(true);
       timer = setTimeout(() => {
         setLoadingState(false);
-        mergedOptions.onSuccess && mergedOptions.onSuccess(state.result.value);
+        mergedOptions.onSuccess && mergedOptions.onSuccess(result.value);
         mergedOptions.onAfter && mergedOptions.onAfter();
       }, 20);
       return;
@@ -69,7 +69,8 @@ const useRequestImplement = <K extends (...args: any[]) => Promise<any>>(request
       abortController = new AbortController();
     }
     setLoadingState(true);
-    await request(...args as any, abortController?.signal).then(resolve, reject);
+    const res = await request(...args as any, abortController?.signal).then(resolve, reject);
+    return res;
   };
   
   const cancel = () => {
@@ -86,11 +87,7 @@ const useRequestImplement = <K extends (...args: any[]) => Promise<any>>(request
     }
   });
 
-  return { state, run, cancel };
-};
-
-const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, options?: IUserOptions) => () => {
-  useRequestImplement(request, options)();
+  return { result, loading, error, run, cancel };
 };
 
 export default useRequest;
