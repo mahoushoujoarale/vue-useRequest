@@ -1,4 +1,4 @@
-import { setGlobalOptions, getGlobalOptions, defaultOptions } from '../src/options';
+import { setGlobalOptions, getGlobalOptions, defaultOptions, defaultRunOptions } from '../src/options';
 import { describe, test, expect, afterEach } from 'vitest';
 import { IGlobalOptions } from '../src/types';
 
@@ -23,5 +23,10 @@ describe('config', () => {
     expect(options.cancelOnDispose).toBe(true);
     expect(options.useLastRequest).toBe(false);
     expect(options.cacheTime).toBe(0);
+  });
+
+  test('should have default runOptions', () => {
+    const options = defaultRunOptions;
+    expect(options.force).toBe(false);
   });
 });

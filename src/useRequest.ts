@@ -17,9 +17,11 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
   let abortController = mergedOptions.cancelLastRequest ? new AbortController() : undefined;
   let isFetching = false;
   let lastCacheTime = 0;
-  let timer: ReturnType<typeof setTimeout> | null = null;
 
-  const resolve = (result: IResult) => {
+  const resolve = (result: IResult, signal?: AbortSignal) => {
+    if (signal?.aborted) {
+      return result;
+    }
     state.result.value = result;
     state.error.value = null;
     setLoadingState(false);
@@ -31,13 +33,13 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
   const reject = (error: Error) => {
     if (error.message === 'canceled') {
       // 取消请求不做处理
-      return;
+      return error;
     }
     state.result.value = null;
     state.error.value = error;
     setLoadingState(false);
-    mergedOptions.onError && mergedOptions.onError(error);
-    mergedOptions.onAfter && mergedOptions.onAfter();
+    mergedOptions.onError?.(error);
+    mergedOptions.onAfter?.();
     return error;
   };
 
@@ -47,21 +49,22 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
   };
 
   const run = async (...args: IParams) => {
-    mergedOptions.onBefore && mergedOptions.onBefore();
+    mergedOptions.onBefore?.();
     if (mergedOptions.useLastRequest && isFetching) {
       // 等待进行中的请求完成
       return;
     }
-    timer && clearTimeout(timer);
     if (mergedOptions.cacheTime > 0 && Date.now() - lastCacheTime < mergedOptions.cacheTime) {
       // 缓存有效期内不再请求，展示一下loading动画即可
       setLoadingState(true);
-      timer = setTimeout(() => {
+      const res = await new Promise(resolve => setTimeout(() => {
         setLoadingState(false);
-        mergedOptions.onSuccess && mergedOptions.onSuccess(result.value);
-        mergedOptions.onAfter && mergedOptions.onAfter();
-      }, 20);
-      return;
+        mergedOptions.onSuccess?.(result.value);
+        mergedOptions.onCache?.(result.value);
+        mergedOptions.onAfter?.();
+        resolve(result.value);
+      }, 20));
+      return res;
     }
     if (mergedOptions.cancelLastRequest && isFetching) {
       // 取消上一次请求
@@ -69,18 +72,23 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
       abortController = new AbortController();
     }
     setLoadingState(true);
-    const res = await request(...args as any, abortController?.signal).then(resolve, reject);
-    return res;
+    try {
+      const currentAbortController = abortController;
+      const res = await request(...args, currentAbortController?.signal);
+      resolve(res, currentAbortController?.signal);
+      return res;
+    } catch (error) {
+      reject(error as Error);
+      return error;
+    }
   };
   
   const cancel = () => {
-    timer && clearTimeout(timer);
     setLoadingState(false);
     abortController?.abort('cancel request');
   };
 
   onScopeDispose(() => {
-    timer && clearTimeout(timer);
     if (mergedOptions.cancelOnDispose && isFetching) {
       // 销毁前取消请求
       cancel();
