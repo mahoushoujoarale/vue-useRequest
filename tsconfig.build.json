@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "exclude": [
-    "test",
-    "coverage",
-    "vitest.config.js",
-    "docs"
-  ]
-}

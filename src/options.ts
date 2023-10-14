@@ -1,4 +1,4 @@
-import { IGlobalOptions, IOptions, IRunOptions } from './types';
+import type { IGlobalOptions, IOptions } from './types';
 
 const GLOBAL_OPTIONS: IGlobalOptions = {};
 
@@ -17,8 +17,4 @@ export const defaultOptions: IOptions = Object.freeze({
   cancelOnDispose: true,
   useLastRequest: false,
   cacheTime: 0,
-});
-
-export const defaultRunOptions: IRunOptions = Object.freeze({
-  force: false,
 });

@@ -1,12 +1,14 @@
 {
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
     "outDir": ".types",
-    "target": "es5",
+    "target": "ESNext",
     "module": "esnext",
+    "importHelpers": true,
     "moduleResolution": "node",
+    "isolatedModules": true,
     "lib": [
       "esnext",
-      "esnext.asynciterable",
       "dom"
     ],
     "resolveJsonModule": true,
@@ -15,8 +17,15 @@
     "allowJs": true,
     "sourceMap": true,
     "strict": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"],
-  "exclude": ["docs", "vitest.config.js", "coverage"]
+  "include": ["src/**/*", "src/**/*.vue", "test/**/*.ts", "test/**/*.vue"],
+  "exclude": ["coverage", "node_modules", "dist"]
 }

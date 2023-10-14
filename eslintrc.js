@@ -1,17 +1,15 @@
 module.exports = {
   root: true,
-  env: {
-    node: true,
-  },
-  parser: '@typescript-eslint/parser',
+  parser: 'vue-eslint-parser',
   extends: [
     'eslint:recommended',
+    'plugin:vue/vue3-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
   ],
-  plugins: ['simple-import-sort', '@typescript-eslint'],
+  plugins: ['simple-import-sort', '@typescript-eslint', 'prettier'],
   parserOptions: {
-    ecmaVersion: 2020,
+    parser: "@typescript-eslint/parser",
     sourceType: 'module',
   },
   rules: {
@@ -29,15 +27,4 @@ module.exports = {
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
   },
-  overrides: [
-    {
-      files: [
-        '**/__tests__/*.{j,t}s?(x)',
-        '**/tests/unit/**/*.spec.{j,t}s?(x)',
-      ],
-      env: {
-        jest: true,
-      },
-    },
-  ],
 };

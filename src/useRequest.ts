@@ -1,13 +1,12 @@
 import { onScopeDispose, shallowRef } from 'vue-demi';
-import { IUserOptions } from './types';
+import type { IUserOptions } from './types';
 import { defaultOptions, getGlobalOptions } from './options';
 
-type ReturnParams<T extends (...args: any) => any> = T extends ((...args: infer R) => any) ? R : any;
-type ReturnPromise<T> = T extends Promise<infer R> ? R : T;
+type RequestFunction<P extends unknown[], R> = (...args: P) => Promise<R>;
 
-const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, options?: IUserOptions) => {
-  type IParams = ReturnParams<K>
-  type IResult = ReturnPromise<ReturnType<K>>
+const useRequest = <P extends unknown[], R>(request: RequestFunction<P, R>, options?: IUserOptions) => {
+  type IParams = P;
+  type IResult = R;
 
   const mergedOptions = { ...defaultOptions, ...getGlobalOptions(), ...options };
   const result = shallowRef<null | IResult>(null);
@@ -22,24 +21,32 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
     if (signal?.aborted) {
       return result;
     }
+
     state.result.value = result;
     state.error.value = null;
     setLoadingState(false);
+
     lastCacheTime = Date.now();
-    mergedOptions.onSuccess && mergedOptions.onSuccess(result);
-    mergedOptions.onAfter && mergedOptions.onAfter();
+
+    mergedOptions.onSuccess?.(result);
+    mergedOptions.onAfter?.();
+
     return result;
   };
+
   const reject = (error: Error) => {
     if (error.message === 'canceled') {
       // 取消请求不做处理
       return error;
     }
+
     state.result.value = null;
     state.error.value = error;
     setLoadingState(false);
+
     mergedOptions.onError?.(error);
     mergedOptions.onAfter?.();
+    
     return error;
   };
 
@@ -49,29 +56,56 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
   };
 
   const run = async (...args: IParams) => {
-    mergedOptions.onBefore?.();
     if (mergedOptions.useLastRequest && isFetching) {
       // 等待进行中的请求完成
       return;
     }
+
+    mergedOptions.onBefore?.();
+
     if (mergedOptions.cacheTime > 0 && Date.now() - lastCacheTime < mergedOptions.cacheTime) {
       // 缓存有效期内不再请求，展示一下loading动画即可
       setLoadingState(true);
       const res = await new Promise(resolve => setTimeout(() => {
         setLoadingState(false);
-        mergedOptions.onSuccess?.(result.value);
-        mergedOptions.onCache?.(result.value);
+        mergedOptions.onSuccess?.(state.result.value);
+        mergedOptions.onCache?.(state.result.value);
         mergedOptions.onAfter?.();
-        resolve(result.value);
+        resolve(state.result.value);
       }, 20));
       return res;
     }
+
     if (mergedOptions.cancelLastRequest && isFetching) {
       // 取消上一次请求
       cancel();
       abortController = new AbortController();
     }
+
     setLoadingState(true);
+
+    try {
+      const currentAbortController = abortController;
+      const res = await request(...args, currentAbortController?.signal);
+      resolve(res, currentAbortController?.signal);
+      return res;
+    } catch (error) {
+      reject(error as Error);
+      return error;
+    }
+  };
+
+  const forceRun = async (...args: IParams) => {
+    mergedOptions.onBefore?.();
+
+    if (isFetching) {
+      // 取消上一次请求
+      cancel();
+      abortController = new AbortController();
+    }
+
+    setLoadingState(true);
+
     try {
       const currentAbortController = abortController;
       const res = await request(...args, currentAbortController?.signal);
@@ -84,6 +118,7 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
   };
   
   const cancel = () => {
+    mergedOptions.onCancel?.();
     setLoadingState(false);
     abortController?.abort('cancel request');
   };
@@ -95,7 +130,7 @@ const useRequest = <K extends (...args: any[]) => Promise<any>>(request: K, opti
     }
   });
 
-  return { result, loading, error, run, cancel };
+  return { result, loading, error, run, forceRun, cancel };
 };
 
 export default useRequest;
