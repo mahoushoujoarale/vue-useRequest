@@ -5,7 +5,7 @@ import { mount } from '@vue/test-utils';
 import Demo from '../component/demo.vue';
 
 describe('function', () => {
-  const request = async (message = 'success') => {
+  const request = async (signal: AbortSignal, message = 'success') => {
     await sleep(100);
     return message;
   };

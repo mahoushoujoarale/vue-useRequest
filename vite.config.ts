@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import path, { resolve } from 'path';
+import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
 import viteCompression from 'vite-plugin-compression';
 
@@ -14,21 +14,19 @@ export default defineConfig(() => ({
       name: 'vue-useRequest',
     },
     rollupOptions: {
-      external: ['vue'],
+      external: ['vue', 'vue-demi'],
       output: {
         globals: {
           vue: 'Vue',
+          'vue-demi': 'VueDemi',
         },
       },
     },
   },
   resolve: {
-    alias: [
-      {
-        find: '@',
-        replacement: path.resolve(__dirname, './src'),
-      },
-    ],
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
   },
   test: {
     globals: true,

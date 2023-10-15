@@ -2,14 +2,8 @@
   <div>useRequest Test Demo</div>
 </template>
 
-<script setup lang="ts">
-import { onMounted } from 'vue-demi';
+<script lang="ts" setup>
 import useRequest from '@/useRequest';
-
-const props = defineProps<{
-  cancelOnDispose: boolean;
-}>();
-const emit = defineEmits(['onCancel']);
 
 const request = async () => {
   return new Promise((resolve) => {
@@ -18,14 +12,19 @@ const request = async () => {
     }, 1000);
   });
 };
+
+const props = defineProps<{
+  cancelOnDispose: boolean;
+}>();
+const emit = defineEmits(['onCancel']);
+
 const onCancel = () => {
   emit('onCancel');
 };
-
 const { run } = useRequest(request, {
   cancelOnDispose: props.cancelOnDispose,
-  onCancel,
+  onCancel: onCancel,
 });
 
-onMounted(run);
+run();
 </script>

@@ -7,14 +7,20 @@ const mockAxiosGet = vi.spyOn(axios, 'get');
 
 describe('life cycle', () => {
   const url = 'https://api.github.com/repos/mahoushoujoarale/vue-useRequest';
-  const getData = async (signal?: AbortSignal) => {
-    const res = await axios.get(url, { signal })
-    return res;
+  const getData = async (signal: AbortSignal) => {
+    const res = await axios.get<string>(url, { signal })
+    return res.data;
+  };
+  const request = async () => {
+    await sleep(100);
+    return 'success';
   };
 
   test('onBefore should been triggered once when success', async () => {
     const onBefore = vi.fn();
-    mockAxiosGet.mockResolvedValueOnce('success');
+    mockAxiosGet.mockResolvedValueOnce({
+      data: 'success',
+    });
 
     const { run } = useRequest(getData, {
       onBefore,
@@ -38,7 +44,9 @@ describe('life cycle', () => {
 
   test('onAfter should been triggered once when success', async () => {
     const onAfter = vi.fn();
-    mockAxiosGet.mockResolvedValueOnce('success');
+    mockAxiosGet.mockResolvedValueOnce({
+      data: 'success',
+    });
 
     const { run } = useRequest(getData, {
       onAfter,
@@ -62,7 +70,9 @@ describe('life cycle', () => {
 
   test('onSuccess should been triggered once when success', async () => {
     const onSuccess = vi.fn();
-    mockAxiosGet.mockResolvedValueOnce('success');
+    mockAxiosGet.mockResolvedValueOnce({
+      data: 'success',
+    });
 
     const { run } = useRequest(getData, {
       onSuccess,
@@ -86,7 +96,9 @@ describe('life cycle', () => {
 
   test('onError should not been triggered when success', async () => {
     const onError = vi.fn();
-    mockAxiosGet.mockResolvedValueOnce('success');
+    mockAxiosGet.mockResolvedValueOnce({
+      data: 'success',
+    });
 
     const { run } = useRequest(getData, {
       onError,
@@ -110,10 +122,6 @@ describe('life cycle', () => {
 
   test('onCache should been triggered when cache is not expired', async () => {
     const onCache = vi.fn();
-    const request = async () => {
-      await sleep(100);
-      return 'success';
-    };
 
     const { run } = useRequest(request, {
       cacheTime: 500,
@@ -129,10 +137,6 @@ describe('life cycle', () => {
 
   test('onCache should not been triggered when cache is expired', async () => {
     const onCache = vi.fn();
-    const request = async () => {
-      await sleep(100);
-      return 'success';
-    };
 
     const { run } = useRequest(request, {
       cacheTime: 10,
@@ -150,10 +154,6 @@ describe('life cycle', () => {
 
   test('onCancel should been triggered when cancel', async () => {
     const onCancel = vi.fn();
-    const request = async () => {
-      await sleep(100);
-      return 'success';
-    };
 
     const { run, cancel } = useRequest(request, {
       cacheTime: 10,

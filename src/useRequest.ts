@@ -2,9 +2,7 @@ import { onScopeDispose, shallowRef } from 'vue-demi';
 import type { IUserOptions } from './types';
 import { defaultOptions, getGlobalOptions } from './options';
 
-type RequestFunction<P extends unknown[], R> = (...args: P) => Promise<R>;
-
-const useRequest = <P extends unknown[], R>(request: RequestFunction<P, R>, options?: IUserOptions) => {
+const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...args: P) => Promise<R>, options?: IUserOptions) => {
   type IParams = P;
   type IResult = R;
 
@@ -13,12 +11,12 @@ const useRequest = <P extends unknown[], R>(request: RequestFunction<P, R>, opti
   const loading = shallowRef(false);
   const error = shallowRef<null | Error>(null);
   const state = { result, loading, error };
-  let abortController = mergedOptions.cancelLastRequest ? new AbortController() : undefined;
+  let abortController = new AbortController();
   let isFetching = false;
   let lastCacheTime = 0;
 
-  const resolve = (result: IResult, signal?: AbortSignal) => {
-    if (signal?.aborted) {
+  const resolve = (result: IResult, signal: AbortSignal) => {
+    if (signal.aborted) {
       return result;
     }
 
@@ -86,8 +84,8 @@ const useRequest = <P extends unknown[], R>(request: RequestFunction<P, R>, opti
 
     try {
       const currentAbortController = abortController;
-      const res = await request(...args, currentAbortController?.signal);
-      resolve(res, currentAbortController?.signal);
+      const res = await request(currentAbortController.signal, ...args);
+      resolve(res, currentAbortController.signal);
       return res;
     } catch (error) {
       reject(error as Error);
@@ -108,8 +106,8 @@ const useRequest = <P extends unknown[], R>(request: RequestFunction<P, R>, opti
 
     try {
       const currentAbortController = abortController;
-      const res = await request(...args, currentAbortController?.signal);
-      resolve(res, currentAbortController?.signal);
+      const res = await request(currentAbortController.signal, ...args);
+      resolve(res, currentAbortController.signal);
       return res;
     } catch (error) {
       reject(error as Error);
@@ -120,7 +118,7 @@ const useRequest = <P extends unknown[], R>(request: RequestFunction<P, R>, opti
   const cancel = () => {
     mergedOptions.onCancel?.();
     setLoadingState(false);
-    abortController?.abort('cancel request');
+    abortController.abort('cancel request');
   };
 
   onScopeDispose(() => {
