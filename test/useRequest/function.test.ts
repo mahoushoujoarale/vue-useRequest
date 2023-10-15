@@ -11,10 +11,10 @@ describe('function', () => {
   };
 
   test('run should work', async () => {
-    const { result, run } = useRequest(request);
+    const { run } = useRequest(request);
 
-    await run();
-    expect(result.value).toBe('success');
+    const res = await run();
+    expect(res).toBe('success');
   });
 
   test('cancel should work', async () => {

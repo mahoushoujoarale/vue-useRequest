@@ -15,11 +15,7 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   let isFetching = false;
   let lastCacheTime = 0;
 
-  const resolve = (result: IResult, signal: AbortSignal) => {
-    if (signal.aborted) {
-      return result;
-    }
-
+  const resolve = (result: IResult) => {
     state.result.value = result;
     state.error.value = null;
     setLoadingState(false);
@@ -56,22 +52,22 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   const run = async (...args: IParams) => {
     if (mergedOptions.useLastRequest && isFetching) {
       // 等待进行中的请求完成
-      return;
+      return new Error('waiting for last request');
     }
 
     mergedOptions.onBefore?.();
 
-    if (mergedOptions.cacheTime > 0 && Date.now() - lastCacheTime < mergedOptions.cacheTime) {
+    if (state.result.value && Date.now() - lastCacheTime < mergedOptions.cacheTime) {
       // 缓存有效期内不再请求，展示一下loading动画即可
       setLoadingState(true);
-      const res = await new Promise(resolve => setTimeout(() => {
+      await new Promise(resolve => setTimeout(() => {
         setLoadingState(false);
         mergedOptions.onSuccess?.(state.result.value);
         mergedOptions.onCache?.(state.result.value);
         mergedOptions.onAfter?.();
         resolve(state.result.value);
       }, 20));
-      return res;
+      return state.result.value;
     }
 
     if (mergedOptions.cancelLastRequest && isFetching) {
@@ -85,11 +81,14 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
     try {
       const currentAbortController = abortController;
       const res = await request(currentAbortController.signal, ...args);
-      resolve(res, currentAbortController.signal);
+      if (currentAbortController.signal.aborted) {
+        throw new Error('canceled');
+      }
+      resolve(res);
       return res;
     } catch (error) {
       reject(error as Error);
-      return error;
+      return error as Error;
     }
   };
 
@@ -107,11 +106,14 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
     try {
       const currentAbortController = abortController;
       const res = await request(currentAbortController.signal, ...args);
-      resolve(res, currentAbortController.signal);
+      if (currentAbortController.signal.aborted) {
+        throw new Error('canceled');
+      }
+      resolve(res);
       return res;
     } catch (error) {
       reject(error as Error);
-      return error;
+      return error as Error;
     }
   };
   
