@@ -3,7 +3,7 @@
 - 🔭 Currently working on web front-end programming
 - 🌱 Currently working at kuaishou
 - 🌲 Worked as an intern at Tencent
-- 👯 Looking forward to join a more pleasant team ~
+- 👯 Looking forward to become better ~
 - 🤔 Future plan: learn next.js
 - 📮 Email: 2536659921@qq.com
 - ⚡ Fun fact: Badminton, PingPong

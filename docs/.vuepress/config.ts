@@ -7,10 +7,10 @@ export default defineUserConfig({
   description: 'A library for manage your request for Vue + Composition API',
   head: [['link', { rel: 'icon', href: '/logo.png' }]],
   theme: recoTheme({
-    repo: 'mahoushoujoarale/vue3-useRequest',
+    repo: 'mahoushoujoarale/vue-useRequest',
     logo: '/logo.png',
     navbar: [
-      { text: '文档', link: '/document/' },
+      { text: '文档', link: '/document/guide' },
       { text: 'API参考', link: '/api/' },
       {
         text: '关于我',
@@ -21,18 +21,18 @@ export default defineUserConfig({
           { text: '支持', link: '/donation/' },
         ],
       },
-      { text: 'ISSUES', link: 'https://github.com/mahoushoujoarale/vue3-useRequest/issues' },
+      { text: 'ISSUES', link: 'https://github.com/mahoushoujoarale/vue-useRequest/issues' },
     ],
     series: {
       '/document/': [
         {
-          text: '基础',
-          children: ['introduce', 'usage'],
-          collapsible: true, // 默认展开，true 为折叠
+          text: '介绍',
+          children: ['guide', 'quick-start'],
         },
         {
-          text: '高级',
-          children: ['home', 'series', 'comments'],
+          text: '文档',
+          children: ['global-options', 'request', 'cache'],
+          collapsible: true,
         },
       ],
     },

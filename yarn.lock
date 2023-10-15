@@ -7996,7 +7996,7 @@ vue@^3.2.45:
     "@vue/server-renderer" "3.2.47"
     "@vue/shared" "3.2.47"
 
-vuepress-theme-reco@^2.0.0-beta.68:
+vuepress-theme-reco@^2.0.0-beta.67:
   version "2.0.0-beta.68"
   resolved "https://npm.corp.kuaishou.com/vuepress-theme-reco/-/vuepress-theme-reco-2.0.0-beta.68.tgz#7f7c585088f2fc2f322931120e05f2a800a27620"
   integrity sha512-D0dfRvpqyLRCVtaaZtLx+LmgZHeyTiT8TGsg0AxT9JGGqS3okneDJPzZqrY3zwTCYJ5NH7VogIe5HtCiE56B6w==
