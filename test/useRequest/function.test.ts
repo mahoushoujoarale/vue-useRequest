@@ -148,6 +148,18 @@ describe('function', () => {
     expect(result.value).toBe('second');
   });
 
+  test('forceRun can be canceled', async () => {
+    const { result, loading, forceRun, cancel } = useRequest(request);
+
+    forceRun();
+    setTimeout(() => cancel(), 50);
+
+    await sleep(120);
+
+    expect(result.value).toBeNull();
+    expect(loading.value).toBe(false);
+  });
+
   test('should cancel request when component is unmount if cancelOnDispose is true', async () => {
     const wrapper = mount(Demo, {
       props: {
