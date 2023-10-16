@@ -1,6 +1,6 @@
 # 快速开始
 
-## 📦 安装
+## 安装
 ### npm
 ```sh
 npm install vue-use-request
@@ -11,7 +11,7 @@ npm install vue-use-request
 yarn add vue-use-request
 ```
 
-## 🔨 使用
+## 使用
 ```vue
 <template>
   <div>

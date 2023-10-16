@@ -31,8 +31,7 @@ export default defineUserConfig({
         },
         {
           text: '文档',
-          children: ['global-options', 'request', 'cache'],
-          collapsible: true,
+          children: ['global-options', 'request', 'cache', 'cancel'],
         },
       ],
     },
