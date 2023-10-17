@@ -1,13 +1,14 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
-    "outDir": ".types",
+    "outDir": ".type",
     "target": "ESNext",
     "module": "esnext",
     "importHelpers": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "dist",
     "moduleResolution": "node",
     "isolatedModules": true,
-    "verbatimModuleSyntax": false,
     "lib": [
       "esnext",
       "dom"
@@ -26,6 +27,6 @@
       ]
     }
   },
-  "include": ["src/**/*", "src/**/*.vue", "test/**/*.ts", "test/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.vue", "test/**/*.ts", "test/**/*.vue"],
   "exclude": ["coverage", "node_modules", "dist"]
 }
