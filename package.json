@@ -1,6 +1,6 @@
 {
   "name": "vue-use-request",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A library for manage your request for Vue + Composition API",
   "main": "src/index.ts",
   "scripts": {
@@ -55,8 +55,7 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
-  "release-it": {
-  },
+  "release-it": {},
   "engines": {
     "node": ">=14"
   },
