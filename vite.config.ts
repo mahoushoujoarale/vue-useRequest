@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { LibraryFormats, defineConfig } from 'vite';
 import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
 import dts from 'vite-plugin-dts';
@@ -15,6 +15,7 @@ export default defineConfig(() => ({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'vue-useRequest',
       fileName: 'index',
+      formats: ['es'] as LibraryFormats[],
     },
     rollupOptions: {
       external: ['vue', 'vue-demi'],

@@ -2,7 +2,7 @@
   "name": "@superarale/vue-use-request",
   "version": "1.1.2",
   "description": "A library for manage your request for Vue + Composition API",
-  "main": "dist/index.umd.js",
+  "main": "dist/index.mjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {

@@ -31,6 +31,7 @@
 | vue-useRequest | ✔ | ✔ | ❌ | ✔ | ❌ | ✔ | ✔ | ✔ | ✔ |
 
 ## 文档
+[vue-useRequest文档](https://mahoushoujoarale.github.io/vue-useRequest-docs/)
 
 ## 安装
 ### npm
@@ -60,10 +61,11 @@ import axios from 'axios';
 import useRequest from 'vue-use-request';
 
 const url = 'https://api.github.com/repos/mahoushoujoarale/vue-useRequest';
-const request = async (signal: AbortSignal) => {
-  return axios.get(url, {
+const request = async (signal) => {
+  const res = await axios.get<string>(url, {
     signal,
-  })
+  });
+  return res.data;
 };
 
 const { data, loading, error, run } = useRequest(request);
