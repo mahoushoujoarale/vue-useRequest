@@ -52,11 +52,10 @@
     "vue-eslint-parser": "^9.3.2",
     "vue-tsc": "^1.8.19"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "release-it": {
-    "github": {
-      "tokenRef": "RELEASE_IT_GITHUB_TOKEN_VC",
-      "release": true
-    }
   },
   "engines": {
     "node": ">=14"
