@@ -2,13 +2,34 @@
   "name": "vue-use-request",
   "version": "1.0.1",
   "description": "A library for manage your request for Vue + Composition API",
-  "main": "src/index.ts",
+  "main": "dist/vue-use-request.mjs",
+  "module": "dist/vue-use-request.mjs",
   "scripts": {
     "build": "vite build",
     "release": "release-it",
     "test": "vitest",
     "coverage": "vitest run --coverage"
   },
+  "keywords": [
+    "vue",
+    "composition api",
+    "vue2",
+    "vue3",
+    "vue-demi",
+    "request",
+    "axios",
+    "fetch",
+    "hooks"
+  ],
+  "homepage": "https://github.com/mahoushoujoarale/vue-useRequest",
+  "bugs": "https://github.com/mahoushoujoarale/vue-useRequest/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mahoushoujoarale/vue-useRequest"
+  },
+  "files": [
+    "dist"
+  ],
   "author": "mahoushoujoarale",
   "license": "MIT",
   "dependencies": {
