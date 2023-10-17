@@ -1,5 +1,5 @@
 {
-  "name": "vue-use-request",
+  "name": "@arlae/vue-use-request",
   "version": "1.0.2",
   "description": "A library for manage your request for Vue + Composition API",
   "main": "dist/vue-use-request.mjs",
@@ -28,7 +28,7 @@
     "url": "https://github.com/mahoushoujoarale/vue-useRequest"
   },
   "files": [
-    "dist"
+    "dist/vue-use-request.mjs"
   ],
   "author": "mahoushoujoarale",
   "license": "MIT",
