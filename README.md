@@ -36,12 +36,12 @@
 ## 安装
 ### npm
 ```sh
-npm install vue-use-request
+npm install @superarale/vue-use-request
 ```
 
 ### yarn
 ```sh
-yarn add vue-use-request
+yarn add @superarale/vue-use-request
 ```
 
 ## 使用
@@ -58,7 +58,7 @@ yarn add vue-use-request
 <script lang="ts" setup>
 import { onMounted } from 'vue';
 import axios from 'axios';
-import useRequest from 'vue-use-request';
+import useRequest from '@superarale/vue-use-request';
 
 const url = 'https://api.github.com/repos/mahoushoujoarale/vue-useRequest';
 const request = async (signal) => {
