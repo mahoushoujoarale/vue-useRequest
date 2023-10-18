@@ -61,10 +61,7 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
       // 缓存有效期内不再请求，展示一下loading动画即可
       setLoadingState(true);
       await new Promise(resolve => setTimeout(() => {
-        setLoadingState(false);
-        mergedOptions.onSuccess?.(state.result.value);
         mergedOptions.onCache?.(state.result.value);
-        mergedOptions.onAfter?.();
         resolve(state.result.value);
       }, 20));
       return state.result.value;
