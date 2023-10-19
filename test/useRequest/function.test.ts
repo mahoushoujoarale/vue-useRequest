@@ -160,6 +160,32 @@ describe('function', () => {
     expect(loading.value).toBe(false);
   });
 
+  test('should retry when fail and retryCount is less than retryTimes util succeed', async () => {
+    const mockRequest = vi.fn(request);
+
+    const { result, run } = useRequest(mockRequest, {
+      retryTimes: 3,
+    });
+    mockRequest.mockRejectedValueOnce(new Error('error'));
+
+    await run();
+    expect(mockRequest).toHaveBeenCalledTimes(2);
+    expect(result.value).toBe('success');
+  });
+
+  test('should retry at most retryTimes when fail', async () => {
+    const mockRequest = vi.fn(request);
+
+    const { error, run } = useRequest(mockRequest, {
+      retryTimes: 3,
+    });
+    mockRequest.mockRejectedValue(new Error('error'));
+
+    await run();
+    expect(error.value?.message).toBe('error');
+    expect(mockRequest).toHaveBeenCalledTimes(4);
+  });
+
   test('should cancel request when component is unmount if cancelOnDispose is true', async () => {
     const wrapper = mount(Demo, {
       props: {

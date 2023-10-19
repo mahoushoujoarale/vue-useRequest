@@ -29,16 +29,9 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
     mergedOptions.onAfter?.();
   };
 
-  const handleError = (error: Error, ...args: IParams) => {
+  const handleError = (error: Error) => {
     if (error.message === 'canceled') {
       // 取消请求不做处理
-      return;
-    }
-
-    if (mergedOptions.retryTimes > retryCount) {
-      // 错误重试
-      retryCount++;
-      runRequest(...args);
       return;
     }
 
@@ -56,18 +49,27 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   };
 
   const runRequest = async (...args: IParams) => {
-    try {
-      const currentAbortController = abortController;
-      const res = await request(currentAbortController.signal, ...args);
-      if (currentAbortController.signal.aborted) {
-        throw new Error('canceled');
+    const currentAbortController = abortController;
+    while (retryCount <= mergedOptions.retryTimes) {
+      try {
+        const res = await request(currentAbortController.signal, ...args);
+        if (currentAbortController.signal.aborted) {
+          return new Error('canceled');
+        }
+        handleSuccess(res);
+        return res;
+      } catch (error) {
+        if ((error as Error).message === 'canceled') {
+          return error as Error;
+        }
+        if (retryCount === mergedOptions.retryTimes) {
+          handleError(error as Error);
+          return error as Error;
+        }
       }
-      handleSuccess(res);
-      return res;
-    } catch (error) {
-      handleError(error as Error, ...args);
-      return error as Error;
+      retryCount++;
     }
+    return new Error('unexpected error');
   };
 
   const run = async (...args: IParams) => {
