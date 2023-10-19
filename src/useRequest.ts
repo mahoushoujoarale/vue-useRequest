@@ -15,8 +15,9 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   let isFetching = false;
   let lastCacheTime = 0;
   let memorizedResult: IResult | null = null;
+  let retryCount = 0;
 
-  const resolve = (result: IResult) => {
+  const handleSuccess = (result: IResult) => {
     state.result.value = result;
     state.error.value = null;
     setLoadingState(false);
@@ -26,14 +27,19 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
 
     mergedOptions.onSuccess?.(result);
     mergedOptions.onAfter?.();
-
-    return result;
   };
 
-  const reject = (error: Error) => {
+  const handleError = (error: Error, ...args: IParams) => {
     if (error.message === 'canceled') {
       // 取消请求不做处理
-      return error;
+      return;
+    }
+
+    if (mergedOptions.retryTimes > retryCount) {
+      // 错误重试
+      retryCount++;
+      runRequest(...args);
+      return;
     }
 
     state.result.value = null;
@@ -42,13 +48,26 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
 
     mergedOptions.onError?.(error);
     mergedOptions.onAfter?.();
-    
-    return error;
   };
 
   const setLoadingState = (loading: boolean) => {
     state.loading.value = loading;
     isFetching = loading;
+  };
+
+  const runRequest = async (...args: IParams) => {
+    try {
+      const currentAbortController = abortController;
+      const res = await request(currentAbortController.signal, ...args);
+      if (currentAbortController.signal.aborted) {
+        throw new Error('canceled');
+      }
+      handleSuccess(res);
+      return res;
+    } catch (error) {
+      handleError(error as Error, ...args);
+      return error as Error;
+    }
   };
 
   const run = async (...args: IParams) => {
@@ -58,13 +77,14 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
     }
 
     mergedOptions.onBefore?.();
+    retryCount = 0;
 
     if (memorizedResult && Date.now() - lastCacheTime < mergedOptions.cacheTime) {
       // 缓存有效期内不再请求，展示一下loading动画即可
       setLoadingState(true);
-      await new Promise(resolve => setTimeout(() => {
+      await new Promise(handleSuccess => setTimeout(() => {
         mergedOptions.onCache?.(memorizedResult);
-        resolve(memorizedResult);
+        handleSuccess(memorizedResult);
       }, 20));
       return memorizedResult;
     }
@@ -77,22 +97,13 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
 
     setLoadingState(true);
 
-    try {
-      const currentAbortController = abortController;
-      const res = await request(currentAbortController.signal, ...args);
-      if (currentAbortController.signal.aborted) {
-        throw new Error('canceled');
-      }
-      resolve(res);
-      return res;
-    } catch (error) {
-      reject(error as Error);
-      return error as Error;
-    }
+    const res = await runRequest(...args);
+    return res;
   };
 
   const forceRun = async (...args: IParams) => {
     mergedOptions.onBefore?.();
+    retryCount = 0;
 
     if (isFetching) {
       // 取消上一次请求
@@ -102,18 +113,8 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
 
     setLoadingState(true);
 
-    try {
-      const currentAbortController = abortController;
-      const res = await request(currentAbortController.signal, ...args);
-      if (currentAbortController.signal.aborted) {
-        throw new Error('canceled');
-      }
-      resolve(res);
-      return res;
-    } catch (error) {
-      reject(error as Error);
-      return error as Error;
-    }
+    const res = await runRequest(...args);
+    return res;
   };
   
   const cancel = () => {

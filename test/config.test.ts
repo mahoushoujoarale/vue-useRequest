@@ -26,6 +26,7 @@ describe('config', () => {
     expect(options.cancelOnDispose).toBe(true);
     expect(options.useLastRequest).toBe(false);
     expect(options.cacheTime).toBe(0);
+    expect(options.retryTimes).toBe(0);
   });
 
   test('default options should be read only', () => {

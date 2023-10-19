@@ -17,4 +17,5 @@ export const defaultOptions: IOptions = Object.freeze({
   cancelOnDispose: true,
   useLastRequest: false,
   cacheTime: 0,
+  retryTimes: 0,
 });

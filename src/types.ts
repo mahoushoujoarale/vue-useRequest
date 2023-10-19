@@ -3,6 +3,7 @@ export interface IOptions {
   cancelOnDispose: boolean;
   useLastRequest: boolean;
   cacheTime: number;
+  retryTimes: number;
 
   onSuccess?: <T>(result: T) => void;
   onCache?: <T>(result: T) => void;
