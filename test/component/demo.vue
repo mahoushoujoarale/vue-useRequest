@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import useRequest from '@/useRequest';
+import { useRequest } from '@/index';
 
 const request = async () => {
   return new Promise((resolve) => {

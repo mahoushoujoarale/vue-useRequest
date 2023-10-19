@@ -1,4 +1,4 @@
-import useRequest from '@/useRequest';
+import { useRequest } from '@/index';
 import { describe, test, expect, vi } from 'vitest';
 import axios from 'axios';
 import { sleep } from '../util';

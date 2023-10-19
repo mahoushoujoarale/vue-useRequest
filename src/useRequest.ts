@@ -1,8 +1,8 @@
 import { onScopeDispose, shallowRef } from 'vue-demi';
-import type { IUserOptions } from './types';
+import type { IUseRequestOptions } from './types';
 import { defaultOptions, getGlobalOptions } from './options';
 
-const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...args: P) => Promise<R>, options?: IUserOptions) => {
+const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...args: P) => Promise<R>, options?: IUseRequestOptions) => {
   type IParams = P;
   type IResult = R;
 

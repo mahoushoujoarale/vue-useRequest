@@ -13,6 +13,4 @@ export interface IOptions {
   onCancel?: () => void;
 }
 
-export interface IUserOptions extends Partial<IOptions> {}
-
-export interface IGlobalOptions extends IUserOptions {}
+export interface IUseRequestOptions extends Partial<IOptions> {}

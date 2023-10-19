@@ -1,8 +1,8 @@
-import type { IGlobalOptions, IOptions } from './types';
+import type { IUseRequestOptions, IOptions } from './types';
 
-const GLOBAL_OPTIONS: IGlobalOptions = {};
+const GLOBAL_OPTIONS: IUseRequestOptions = {};
 
-export const setGlobalOptions = (config: IGlobalOptions) => {
+export const setGlobalOptions = (config: IUseRequestOptions) => {
   Object.keys(config).forEach(key => {
     GLOBAL_OPTIONS[key] = config[key];
   });

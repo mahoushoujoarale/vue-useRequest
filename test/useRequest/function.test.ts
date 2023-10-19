@@ -1,4 +1,4 @@
-import useRequest from '@/useRequest';
+import { useRequest } from '@/index';
 import { describe, test, expect, vi } from 'vitest';
 import { sleep } from '../util';
 import { mount } from '@vue/test-utils';
