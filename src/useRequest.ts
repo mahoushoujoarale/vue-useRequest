@@ -7,13 +7,14 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   type IResult = R;
 
   const mergedOptions = { ...defaultOptions, ...getGlobalOptions(), ...options };
-  const result = shallowRef<null | IResult>(null);
+  const result = shallowRef<IResult | null>(null);
   const loading = shallowRef(false);
-  const error = shallowRef<null | Error>(null);
+  const error = shallowRef<Error | null>(null);
   const state = { result, loading, error };
   let abortController = new AbortController();
   let isFetching = false;
   let lastCacheTime = 0;
+  let memorizedResult: IResult | null = null;
 
   const resolve = (result: IResult) => {
     state.result.value = result;
@@ -21,6 +22,7 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
     setLoadingState(false);
 
     lastCacheTime = Date.now();
+    memorizedResult = result;
 
     mergedOptions.onSuccess?.(result);
     mergedOptions.onAfter?.();
@@ -57,14 +59,14 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
 
     mergedOptions.onBefore?.();
 
-    if (state.result.value && Date.now() - lastCacheTime < mergedOptions.cacheTime) {
+    if (memorizedResult && Date.now() - lastCacheTime < mergedOptions.cacheTime) {
       // 缓存有效期内不再请求，展示一下loading动画即可
       setLoadingState(true);
       await new Promise(resolve => setTimeout(() => {
-        mergedOptions.onCache?.(state.result.value);
-        resolve(state.result.value);
+        mergedOptions.onCache?.(memorizedResult);
+        resolve(memorizedResult);
       }, 20));
-      return state.result.value;
+      return memorizedResult;
     }
 
     if (mergedOptions.cancelLastRequest && isFetching) {
