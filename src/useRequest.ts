@@ -17,6 +17,10 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   let memorizedResult: IResult | null = null;
   let retryCount = 0;
 
+  const isAbortError = (error: Error) => {
+    return error.message === 'canceled' || error.name === 'AbortError';
+  };
+
   const handleSuccess = (result: IResult) => {
     state.result.value = result;
     state.error.value = null;
@@ -30,7 +34,7 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   };
 
   const handleError = (error: Error) => {
-    if (error.message === 'canceled' || error.name === 'AbortError') {
+    if (isAbortError(error)) {
       return;
     }
 
@@ -58,7 +62,7 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
         handleSuccess(res);
         return res;
       } catch (error) {
-        if ((error as Error).message === 'canceled') {
+        if (isAbortError(error as Error)) {
           return error as Error;
         }
         if (retryCount === mergedOptions.retryTimes) {
