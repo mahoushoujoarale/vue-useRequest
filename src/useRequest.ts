@@ -30,8 +30,7 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   };
 
   const handleError = (error: Error) => {
-    if (error.message === 'canceled') {
-      // 取消请求不做处理
+    if (error.message === 'canceled' || error.name === 'AbortError') {
       return;
     }
 
@@ -74,7 +73,6 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
 
   const run = async (...args: IParams) => {
     if (mergedOptions.useLastRequest && isFetching) {
-      // 等待进行中的请求完成
       return new Error('waiting for last request');
     }
 
@@ -82,7 +80,6 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
     retryCount = 0;
 
     if (memorizedResult && Date.now() - lastCacheTime < mergedOptions.cacheTime) {
-      // 缓存有效期内不再请求，展示一下loading动画即可
       setLoadingState(true);
       await new Promise(handleSuccess => setTimeout(() => {
         mergedOptions.onCache?.(memorizedResult);
@@ -92,7 +89,6 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
     }
 
     if (mergedOptions.cancelLastRequest && isFetching) {
-      // 取消上一次请求
       cancel();
       abortController = new AbortController();
     }
@@ -108,7 +104,6 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
     retryCount = 0;
 
     if (isFetching) {
-      // 取消上一次请求
       cancel();
       abortController = new AbortController();
     }
@@ -127,7 +122,6 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
 
   onScopeDispose(() => {
     if (mergedOptions.cancelOnDispose && isFetching) {
-      // 销毁前取消请求
       cancel();
     }
   });
