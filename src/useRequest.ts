@@ -36,10 +36,6 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   };
 
   const handleError = (error: Error) => {
-    if (isAbortError(error)) {
-      return;
-    }
-
     state.result.value = null;
     state.error.value = error;
     setLoadingState(false);
@@ -64,8 +60,8 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
         handleSuccess(res);
         return res;
       } catch (error) {
-        if (isAbortError(error as Error)) {
-          return error as Error;
+        if (currentAbortController.signal.aborted) {
+          return new Error('canceled');
         }
         if (retryCount === mergedOptions.retryTimes) {
           handleError(error as Error);
