@@ -2,7 +2,7 @@ import { onScopeDispose, shallowRef } from 'vue-demi';
 import type { IUseRequestOptions } from './types';
 import { defaultOptions, getGlobalOptions } from './options';
 
-const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...args: P) => Promise<R>, options?: IUseRequestOptions) => {
+const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...args: P) => Promise<R>, options?: IUseRequestOptions<R>) => {
   type IParams = P;
   type IResult = R;
 
@@ -21,13 +21,15 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
     return error.message === 'canceled' || error.name === 'AbortError';
   };
 
-  const handleSuccess = (result: IResult) => {
+  const handleSuccess = (result: IResult, isFromCache = false) => {
     state.result.value = result;
     state.error.value = null;
     setLoadingState(false);
 
-    lastCacheTime = Date.now();
-    memorizedResult = result;
+    if (!isFromCache) {
+      lastCacheTime = Date.now();
+      memorizedResult = result;
+    }
 
     mergedOptions.onSuccess?.(result);
     mergedOptions.onAfter?.();
@@ -85,11 +87,12 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
 
     if (memorizedResult && Date.now() - lastCacheTime < mergedOptions.cacheTime) {
       setLoadingState(true);
-      await new Promise(handleSuccess => setTimeout(() => {
-        mergedOptions.onCache?.(memorizedResult);
-        handleSuccess(memorizedResult);
+      const res = await new Promise<IResult>(reolve => setTimeout(() => {
+        reolve(memorizedResult!);
       }, 20));
-      return memorizedResult;
+      mergedOptions.onCache?.(res);
+      handleSuccess(res, true);
+      return res;
     }
 
     if (mergedOptions.cancelLastRequest && isFetching) {

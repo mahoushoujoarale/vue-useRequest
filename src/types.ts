@@ -4,13 +4,14 @@ export interface IOptions {
   useLastRequest: boolean;
   cacheTime: number;
   retryTimes: number;
+}
 
-  onSuccess?: <T>(result: T) => void;
-  onCache?: <T>(result: T) => void;
+export interface IGlobalOptions extends Partial<IOptions> {}
+
+export interface IUseRequestOptions<T> extends Partial<IOptions> {
+  onSuccess?: (result: T) => void;
+  onCache?: (result: T) => void;
   onError?: (error: Error) => void;
   onBefore?: () => void;
   onAfter?: () => void;
-  onCancel?: () => void;
-}
-
-export interface IUseRequestOptions extends Partial<IOptions> {}
+  onCancel?: () => void;}

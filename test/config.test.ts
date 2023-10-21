@@ -1,6 +1,6 @@
 import { setGlobalOptions, getGlobalOptions, defaultOptions } from '@/options';
 import { describe, test, expect, afterEach, vi } from 'vitest';
-import type { IUseRequestOptions } from '@/types';
+import type { IGlobalOptions } from '@/types';
 
 describe('config', () => {
   afterEach(() => {
@@ -8,7 +8,7 @@ describe('config', () => {
   });
 
   test('should set and get global options correctly', () => {
-    const globalConfig: IUseRequestOptions = {
+    const globalConfig: IGlobalOptions = {
       cancelLastRequest: false,
       useLastRequest: true,
     };
