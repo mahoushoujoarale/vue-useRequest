@@ -39,7 +39,7 @@
   "peerDependencies": {
     "@vue/composition-api": "^1.0.0-rc.1",
     "axios": "^0.22.0",
-    "vue": "^3.2.20 || ^2.7.0"
+    "vue": "^3.2.20 || ^2.6.0"
   },
   "peerDependenciesMeta": {
     "@vue/composition-api": {
