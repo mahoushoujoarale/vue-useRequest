@@ -14,4 +14,5 @@ export interface IUseRequestOptions<T> extends Partial<IOptions> {
   onError?: (error: Error) => void;
   onBefore?: () => void;
   onAfter?: () => void;
-  onCancel?: () => void;}
+  onCancel?: () => void;
+}

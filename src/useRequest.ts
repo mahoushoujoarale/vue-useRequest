@@ -17,10 +17,6 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   let memorizedResult: IResult | null = null;
   let retryCount = 0;
 
-  const isAbortError = (error: Error) => {
-    return error.message === 'canceled' || error.name === 'AbortError';
-  };
-
   const handleSuccess = (result: IResult, isFromCache = false) => {
     state.result.value = result;
     state.error.value = null;
@@ -93,8 +89,8 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
 
     if (mergedOptions.cancelLastRequest && isFetching) {
       cancel();
-      abortController = new AbortController();
     }
+    abortController = new AbortController();
 
     setLoadingState(true);
 
@@ -108,8 +104,8 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
 
     if (isFetching) {
       cancel();
-      abortController = new AbortController();
     }
+    abortController = new AbortController();
 
     setLoadingState(true);
 
@@ -118,9 +114,14 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   };
   
   const cancel = () => {
-    mergedOptions.onCancel?.();
-    setLoadingState(false);
-    abortController.abort('cancel request');
+    if (isFetching) {
+      mergedOptions.onCancel?.();
+      setLoadingState(false);
+      abortController.abort('cancel request');
+      return true;
+    }
+
+    return false;
   };
 
   onScopeDispose(() => {
