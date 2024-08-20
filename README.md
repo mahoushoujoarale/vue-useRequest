@@ -29,7 +29,7 @@
 | TanStack Query | ✔ | ✔ | ✔ | ❌ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | vue-request | ✔ | ✔ | ✔ | ❌ | ❌ | ✔ | ✔ | ✔ | ✔ |
 | vue-use useFetch | ✔ | ✔ | ✔ | ❌ | ❌ | ✔ | ✔ | ❌ | ✔ |
-| vue-useRequest | ✔ | ✔ | ❌ | ✔ | ❌ | ✔ | ✔ | ✔ | ✔ |
+| vue-useRequest | ✔ | ✔ | ✔ | ✔ | ❌ | ✔ | ✔ | ✔ | ✔ |
 
 ## 文档
 [vue-useRequest文档](https://mahoushoujoarale.github.io/vue-useRequest-docs/)
