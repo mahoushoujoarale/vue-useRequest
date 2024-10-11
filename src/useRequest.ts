@@ -1,4 +1,4 @@
-import { onScopeDispose, shallowRef } from 'vue-demi';
+import { markRaw, onScopeDispose, shallowRef } from 'vue-demi';
 import type { IUseRequestOptions } from './types';
 import { defaultOptions, getGlobalOptions } from './options';
 
@@ -16,6 +16,9 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
   let lastCacheTime = 0;
   let memorizedResult: IResult | null = null;
   let retryCount = 0;
+  if (mergedOptions.rawResult) {
+    markRaw(result);
+  }
 
   const handleSuccess = (result: IResult, isFromCache = false) => {
     state.result.value = result;

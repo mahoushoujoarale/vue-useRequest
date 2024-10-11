@@ -4,6 +4,7 @@ export interface IOptions {
   useLastRequest: boolean;
   cacheTime: number;
   retryTimes: number;
+  rawResult: boolean;
 }
 
 export interface IGlobalOptions extends Partial<IOptions> {}
