@@ -22,7 +22,7 @@ const useRequest = <P extends unknown[], R>(request: (signal:AbortSignal, ...arg
     state.error.value = null;
     setLoadingState(false);
 
-    if (!isFromCache) {
+    if (!isFromCache && mergedOptions.cacheTime > 0) {
       lastCacheTime = Date.now();
       memorizedResult = result;
     }
